@@ -1,1 +1,1 @@
-# AWS-Lambda-inOne-Time-Encrypted-Link-Generator  SecureLink is a serverless application that allows users to generate one-time, self-destructing encrypted links to securely share messages or files. Once the link is opened, the content is destroyed from the backend (DynamoDB or S3), ensuring privacy.
+# AWS-Lambda-inOne-Time-Encrypted-Link-Generator 
