@@ -1,0 +1,278 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOOZyLbfI03Wp2Djf5+OAq6",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/GUNDESANDEEP/AWS-Lambda-inOne-Time-Encrypted-Link-Generator/blob/main/README.md\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "id": "8Tnu-zKMp41D"
+      },
+      "outputs": [],
+      "source": [
+        "# Imports\n",
+        "import base64\n",
+        "import uuid\n",
+        "from cryptography.fernet import Fernet\n",
+        "\n",
+        "# Generate a key (in real apps, store securely)\n",
+        "key = Fernet.generate_key()\n",
+        "fernet = Fernet(key)\n",
+        "\n",
+        "# Simulate backend DB (in-memory dict)\n",
+        "storage = {}\n",
+        "\n",
+        "# Function to generate encrypted one-time link\n",
+        "def generate_one_time_link(message):\n",
+        "    encrypted_msg = fernet.encrypt(message.encode()).decode()\n",
+        "    unique_id = str(uuid.uuid4())\n",
+        "    storage[unique_id] = encrypted_msg\n",
+        "    return f\"https://securelink.fake/{unique_id}\"\n",
+        "\n",
+        "# Function to view/decrypt message (one-time use)\n",
+        "def access_message(link_id):\n",
+        "    if link_id in storage:\n",
+        "        decrypted = fernet.decrypt(storage[link_id].encode()).decode()\n",
+        "        del storage[link_id]  # one-time access: delete after view\n",
+        "        return f\" Message: {decrypted}\"\n",
+        "    else:\n",
+        "        return \" This link has expired or does not exist.\"\n"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Simulate user input\n",
+        "message = input(\"Enter your secret message: \")\n",
+        "generated_link = generate_one_time_link(message)\n",
+        "\n",
+        "# Display output like a frontend\n",
+        "print(\"\\n✅ Your one-time secure link is:\")\n",
+        "print(generated_link)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "8CiCdRQ3qMpz",
+        "outputId": "a86ec4b3-0f63-4da7-8ac2-b9b4e527f54f"
+      },
+      "execution_count": 2,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Enter your secret message: lovelable\n",
+            "\n",
+            "✅ Your one-time secure link is:\n",
+            "https://securelink.fake/943f0211-e731-4b65-a2a0-c115aeb87957\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Simulate accessing the message\n",
+        "link_id = generated_link.split(\"/\")[-1]\n",
+        "print(\"\\n Accessing the secure message...\")\n",
+        "print(access_message(link_id))\n",
+        "\n",
+        "# Try again (should show expired message)\n",
+        "print(\"\\n Trying to reuse the same link...\")\n",
+        "print(access_message(link_id))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZVumRDLQqlRF",
+        "outputId": "cebc1dca-e1c8-4d7c-b995-622c9782660b"
+      },
+      "execution_count": 3,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n",
+            " Accessing the secure message...\n",
+            " Message: lovelable\n",
+            "\n",
+            " Trying to reuse the same link...\n",
+            " This link has expired or does not exist.\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "metadata": {
+        "id": "qpkXOGFdq7cP"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Install the cryptography package if not already installed\n",
+        "!pip install cryptography\n",
+        "\n",
+        "# Imports\n",
+        "import uuid\n",
+        "from cryptography.fernet import Fernet\n",
+        "\n",
+        "# Generate encryption key\n",
+        "key = Fernet.generate_key()\n",
+        "fernet = Fernet(key)\n",
+        "\n",
+        "# Temporary in-memory database\n",
+        "db = {}\n",
+        "\n",
+        "# Generate one-time encrypted link\n",
+        "def generate_link(message):\n",
+        "    encrypted = fernet.encrypt(message.encode()).decode()\n",
+        "    uid = str(uuid.uuid4())\n",
+        "    db[uid] = encrypted\n",
+        "    return f\"https://securelink.fake/{uid}\", uid\n",
+        "\n",
+        "# Access message function (simulates visiting the link)\n",
+        "def access_link(uid):\n",
+        "    if uid in db:\n",
+        "        decrypted = fernet.decrypt(db[uid].encode()).decode()\n",
+        "        del db[uid]  # Self-destruct\n",
+        "        return f\"✅ Decrypted Message: {decrypted}\"\n",
+        "    else:\n",
+        "        return \"❌ This link has expired or does not exist.\"\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "bmtp5Um9sSDx",
+        "outputId": "044d7c43-5a6a-4335-8fcf-172f74002f6e"
+      },
+      "execution_count": 4,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Requirement already satisfied: cryptography in /usr/local/lib/python3.11/dist-packages (43.0.3)\n",
+            "Requirement already satisfied: cffi>=1.12 in /usr/local/lib/python3.11/dist-packages (from cryptography) (1.17.1)\n",
+            "Requirement already satisfied: pycparser in /usr/local/lib/python3.11/dist-packages (from cffi>=1.12->cryptography) (2.22)\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Simulate entering a secret\n",
+        "secret_message = \"Hello ishu it's my LP pass:sandy\"\n",
+        "link, link_id = generate_link(secret_message)\n",
+        "\n",
+        "# Display the generated link\n",
+        "print(\"🔗 Your one-time secure link is:\")\n",
+        "print(link)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "7Hf3kS2GsVNb",
+        "outputId": "16227da1-9be3-4d8a-f32d-1782dfca6ba4"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "🔗 Your one-time secure link is:\n",
+            "https://securelink.fake/cc2209e3-7187-4a9c-ad4b-8b7c1ba05a09\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# First visit to the link\n",
+        "print(\" First time accessing the link...\")\n",
+        "print(access_link(link_id))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "TmKHrU_tstGr",
+        "outputId": "9e5942d8-4b26-4926-f3b1-9fcbfc1c9e10"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            " First time accessing the link...\n",
+            "✅ Decrypted Message: Hello ishu it's my LP pass:sandy\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Try to visit the same link again\n",
+        "print(\" Reusing the same link...\")\n",
+        "print(access_link(link_id))\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "66aAZ0o9szzF",
+        "outputId": "92d925fe-66a8-4897-edec-0da018d2929d"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            " Reusing the same link...\n",
+            "❌ This link has expired or does not exist.\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
