@@ -1,4 +1,4 @@
-# aws_lambda_hackathon
+# AWS_Lambda_Hackathon
 # 🔐 SecureLink: One-Time Encrypted Link Generator
 
 A serverless Python-based application that allows users to generate encrypted, one-time-use links to securely share confidential messages. Powered by AWS Lambda and API Gateway, SecureLink ensures privacy, encryption, and auto-destruction of sensitive content after first access.
